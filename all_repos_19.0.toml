@@ -177,7 +177,6 @@ oca = [
   "web-api",
   "web-api-contrib",
   "webhook",
-  "webkit-tools",
   "website",
   "website-cms",
   "website-themes",
