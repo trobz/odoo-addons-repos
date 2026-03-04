@@ -1,4 +1,4 @@
-name: Update OCA repos
+name: Update repos
 
 on:
   schedule:
