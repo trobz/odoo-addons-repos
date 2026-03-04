@@ -35,7 +35,7 @@ def get_oca_repos():
     repos = []
     for repo in paginate("https://api.github.com/orgs/OCA/repos", {"type": "all"}):
         name = repo["name"]
-        if name in ("OCB", "OpenUpgrade"):
+        if name in ("OCB", "OpenUpgrade", "odoo-test-helper", "oca-custom", "oca.recipe.odoo", "webkit-tools"):
             continue
         if name.startswith("l10n-") and name != "l10n-france":
             continue
