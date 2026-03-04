@@ -110,7 +110,11 @@ def main():
             f.write('odoo = ["odoo"]\n')
             for org in org_repo_versions:
                 repos_for_version = sorted(version_org_repos[version][org])
-                write_toml_org_section(f, org, {r: [] for r in repos_for_version})
+                f.write(f"{org} = [\n")
+                f.write("  # addons repositories\n")
+                for repo in repos_for_version:
+                    f.write(f'  "{repo}",\n')
+                f.write("]\n")
         total = sum(len(v) for v in version_org_repos[version].values())
         print(f"Wrote {filename} ({total} repos)")
 
