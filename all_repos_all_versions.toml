@@ -190,3 +190,11 @@ oca = [
   "website-themes",
   "wms",
 ]
+camptocamp = [
+  # addons repositories
+  "odoo-cloud-platform",
+]
+forgeflow = [
+  # addons repositories
+  "stock-rma",
+]
