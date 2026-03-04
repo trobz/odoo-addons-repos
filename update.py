@@ -6,6 +6,12 @@ import requests
 
 VERSIONS = ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
 
+# Non-OCA orgs: org -> explicit list of repos to track
+EXTRA_ORGS = {
+    "camptocamp": ["odoo-cloud-platform"],
+    "forgeflow": ["stock-rma"],
+}
+
 TOKEN = os.environ.get("GITHUB_TOKEN")
 HEADERS = {"Authorization": f"token {TOKEN}"} if TOKEN else {}
 
@@ -37,47 +43,76 @@ def get_oca_repos():
     return repos
 
 
-def get_repo_branches(repo_name):
+def get_repo_branches(org, repo_name):
     branches = set()
     try:
-        for branch in paginate(f"https://api.github.com/repos/OCA/{repo_name}/branches"):
+        for branch in paginate(f"https://api.github.com/repos/{org}/{repo_name}/branches"):
             branches.add(branch["name"])
     except requests.HTTPError as e:
-        print(f"Warning: could not fetch branches for {repo_name}: {e}")
+        print(f"Warning: could not fetch branches for {org}/{repo_name}: {e}")
     return branches
 
 
+def write_toml_org_section(f, org, repo_versions, all_versions=False):
+    """Write the [org] section of the oca/extra org list."""
+    f.write(f"{org} = [\n")
+    f.write("  # addons repositories\n")
+    for repo in sorted(repo_versions):
+        versions = repo_versions[repo]
+        if not versions:
+            continue
+        if all_versions and versions == VERSIONS:
+            f.write(f'  "{repo}",\n')
+        elif all_versions:
+            v_str = ", ".join(f'"{v}"' for v in versions)
+            f.write(f'  ["{repo}", [{v_str}]],\n')
+        else:
+            f.write(f'  "{repo}",\n')
+    f.write("]\n")
+
+
 def main():
+    # Fetch OCA repos
     print("Fetching OCA repos...")
-    repos = get_oca_repos()
-    print(f"Found {len(repos)} repos")
+    oca_repos = get_oca_repos()
+    print(f"Found {len(oca_repos)} OCA repos")
 
-    version_repos = {v: [] for v in VERSIONS}
-    repo_versions = {}
+    # org -> repo -> [versions]
+    org_repo_versions = {"oca": {}}
 
-    for i, repo in enumerate(sorted(repos), 1):
-        print(f"[{i}/{len(repos)}] Checking {repo}...")
-        branches = get_repo_branches(repo)
-        versions_for_repo = [v for v in VERSIONS if v in branches]
-        repo_versions[repo] = versions_for_repo
-        for v in versions_for_repo:
-            version_repos[v].append(repo)
+    for i, repo in enumerate(sorted(oca_repos), 1):
+        print(f"[{i}/{len(oca_repos)}] OCA/{repo}...")
+        branches = get_repo_branches("OCA", repo)
+        org_repo_versions["oca"][repo] = [v for v in VERSIONS if v in branches]
+
+    # Fetch extra org repos
+    for org, repos in EXTRA_ORGS.items():
+        org_repo_versions[org] = {}
+        for repo in repos:
+            print(f"Checking {org}/{repo}...")
+            branches = get_repo_branches(org, repo)
+            org_repo_versions[org][repo] = [v for v in VERSIONS if v in branches]
+
+    # Build version -> {org -> [repos]} mapping
+    version_org_repos = {v: {org: [] for org in org_repo_versions} for v in VERSIONS}
+    for org, repo_versions in org_repo_versions.items():
+        for repo, versions in repo_versions.items():
+            for v in versions:
+                version_org_repos[v][org].append(repo)
 
     # Write per-version TOML files
     for version in VERSIONS:
         filename = f"all_repos_{version}.toml"
-        oca_repos = sorted(version_repos[version])
         with open(filename, "w") as f:
             f.write(f'versions = ["{version}"]\n')
             f.write("\n")
             f.write("[repos]\n")
             f.write('odoo = ["odoo"]\n')
-            f.write("oca = [\n")
-            f.write("  # addons repositories\n")
-            for repo in oca_repos:
-                f.write(f'  "{repo}",\n')
-            f.write("]\n")
-        print(f"Wrote {filename} ({len(oca_repos)} repos)")
+            for org in org_repo_versions:
+                repos_for_version = sorted(version_org_repos[version][org])
+                write_toml_org_section(f, org, {r: [] for r in repos_for_version})
+        total = sum(len(v) for v in version_org_repos[version].values())
+        print(f"Wrote {filename} ({total} repos)")
 
     # Write aggregate TOML file
     versions_str = ", ".join(f'"{v}"' for v in VERSIONS)
@@ -86,18 +121,8 @@ def main():
         f.write("\n")
         f.write("[repos]\n")
         f.write('odoo = ["odoo"]\n')
-        f.write("oca = [\n")
-        f.write("  # addons repositories\n")
-        for repo in sorted(repo_versions):
-            versions = repo_versions[repo]
-            if not versions:
-                continue
-            if versions == VERSIONS:
-                f.write(f'  "{repo}",\n')
-            else:
-                v_str = ", ".join(f'"{v}"' for v in versions)
-                f.write(f'  ["{repo}", [{v_str}]],\n')
-        f.write("]\n")
+        for org, repo_versions in org_repo_versions.items():
+            write_toml_org_section(f, org, repo_versions, all_versions=True)
     print("Wrote all_repos_all_versions.toml")
 
 
