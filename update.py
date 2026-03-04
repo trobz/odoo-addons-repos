@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch OCA repos and generate TOML/YAML files tracking which versions each repo supports."""
+"""Fetch OCA repos and generate TOML files tracking which versions each repo supports."""
 
 import os
 import requests
@@ -79,14 +79,26 @@ def main():
             f.write("]\n")
         print(f"Wrote {filename} ({len(oca_repos)} repos)")
 
-    # Write aggregate YAML file
-    with open("all_repos_all_versions.yml", "w") as f:
+    # Write aggregate TOML file
+    versions_str = ", ".join(f'"{v}"' for v in VERSIONS)
+    with open("all_repos_all_versions.toml", "w") as f:
+        f.write(f"versions = [{versions_str}]\n")
+        f.write("\n")
+        f.write("[repos]\n")
+        f.write('odoo = ["odoo"]\n')
+        f.write("oca = [\n")
+        f.write("  # addons repositories\n")
         for repo in sorted(repo_versions):
             versions = repo_versions[repo]
-            if versions:
-                versions_str = ", ".join(f'"{v}"' for v in versions)
-                f.write(f'- ["{repo}", [{versions_str}]]\n')
-    print("Wrote all_repos_all_versions.yml")
+            if not versions:
+                continue
+            if versions == VERSIONS:
+                f.write(f'  "{repo}",\n')
+            else:
+                v_str = ", ".join(f'"{v}"' for v in versions)
+                f.write(f'  ["{repo}", [{v_str}]],\n')
+        f.write("]\n")
+    print("Wrote all_repos_all_versions.toml")
 
 
 if __name__ == "__main__":
