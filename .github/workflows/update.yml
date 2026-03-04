@@ -1,0 +1,68 @@
+name: Update OCA repos
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run update script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 update.py
+
+      - name: Check for changes
+        id: check
+        run: |
+          git add all_repos_*.toml all_repos_all_versions.yml
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create branch and commit
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          BRANCH="auto-update/$(date -u +%Y-%m-%d-%H%M%S)"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git commit -m "chore: update OCA repos data"
+          git push origin "$BRANCH"
+          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
+
+      - name: Create PR
+        if: steps.check.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DIFF=$(git diff origin/main..HEAD --stat)
+          gh pr create \
+            --title "chore: update OCA repos data" \
+            --body "Automated update of OCA repos data.
+
+          ## Changes
+          \`\`\`
+          $DIFF
+          \`\`\`" \
+            --head "$BRANCH" \
+            --base main
+
+      - name: Auto-merge PR
+        if: steps.check.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge --merge "$BRANCH"
