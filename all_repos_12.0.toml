@@ -25,7 +25,6 @@ oca = [
   "community-data-files",
   "connector",
   "connector-accountedge",
-  "connector-cmis",
   "connector-ecommerce",
   "connector-infor",
   "connector-interfaces",
