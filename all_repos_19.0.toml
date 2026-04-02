@@ -156,6 +156,7 @@ oca = [
   "survey",
   "tier-validation",
   "timesheet",
+  "version-control-platform",
   "vertical-abbey",
   "vertical-agriculture",
   "vertical-association",
