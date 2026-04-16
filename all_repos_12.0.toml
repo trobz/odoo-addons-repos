@@ -60,7 +60,7 @@ oca = [
   "helpdesk",
   "hr",
   "infrastructure",
-  "interface-github",
+  "interface-git",
   "intrastat-extrastat",
   "iot",
   "knowledge",

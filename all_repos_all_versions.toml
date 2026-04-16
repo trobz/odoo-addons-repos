@@ -74,7 +74,7 @@ oca = [
   ["hr-expense", ["13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]],
   ["hr-holidays", ["13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]],
   "infrastructure",
-  "interface-github",
+  "interface-git",
   "intrastat-extrastat",
   "iot",
   "knowledge",
