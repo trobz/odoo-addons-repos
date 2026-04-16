@@ -74,7 +74,7 @@ oca = [
   "hr-expense",
   "hr-holidays",
   "infrastructure",
-  "interface-github",
+  "interface-git",
   "intrastat-extrastat",
   "iot",
   "knowledge",
