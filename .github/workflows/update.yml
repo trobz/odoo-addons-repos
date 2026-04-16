@@ -65,7 +65,7 @@ jobs:
         if: steps.check.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr merge --merge "$BRANCH"
+        run: gh pr merge --merge --auto "$BRANCH"
 
       - name: Delete branch
         if: steps.check.outputs.changed == 'true'
