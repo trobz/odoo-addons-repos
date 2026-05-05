@@ -117,6 +117,7 @@ oca = [
   "rest-framework",
   "rma",
   "role-policy",
+  "route-planning",
   "sale-blanket",
   "sale-channel",
   "sale-financial",
