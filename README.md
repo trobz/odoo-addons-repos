@@ -4,7 +4,7 @@ A registry of [OCA](https://github.com/OCA) (and select non-OCA) Odoo addon repo
 
 ## Purpose
 
-This repository tracks which OCA addon repos exist and which Odoo versions each one supports (12.0 → 19.0). It generates ready-to-use TOML files that can be included in a `tlc` config to clone or update a full set of addon repositories for a given Odoo version.
+This repository tracks which OCA addon repos exist and which Odoo versions each one supports (12.0 → 20.0). It generates ready-to-use TOML files that can be included in a `tlc` config to clone or update a full set of addon repositories for a given Odoo version.
 
 ## Files
 
