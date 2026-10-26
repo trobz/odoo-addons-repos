@@ -4,7 +4,7 @@
 import os
 import requests
 
-VERSIONS = ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
+VERSIONS = ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0", "20.0"]
 
 # Non-OCA orgs: org -> explicit list of repos to track
 EXTRA_ORGS = {
