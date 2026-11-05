@@ -94,6 +94,7 @@ oca = [
   "mis-builder-contrib",
   ["module-composition-analysis", ["16.0", "17.0", "18.0", "19.0", "20.0"]],
   "multi-company",
+  ["oca-demo", ["18.0"]],
   "odoo-pim",
   "operating-unit",
   "partner-contact",
