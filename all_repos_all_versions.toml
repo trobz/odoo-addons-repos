@@ -105,6 +105,7 @@ oca = [
   ["product-configurator", ["14.0", "15.0", "16.0", "17.0", "18.0", "19.0", "20.0"]],
   "product-kitting",
   "product-pack",
+  ["product-uom", ["20.0"]],
   "product-variant",
   ["program", ["14.0", "15.0", "16.0", "17.0", "18.0", "19.0", "20.0"]],
   "project",

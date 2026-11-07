@@ -104,6 +104,7 @@ oca = [
   "product-configurator",
   "product-kitting",
   "product-pack",
+  "product-uom",
   "product-variant",
   "program",
   "project",
