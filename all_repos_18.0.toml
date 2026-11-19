@@ -66,6 +66,7 @@ oca = [
   "edi",
   "edi-ediversa",
   "edi-framework",
+  "edi-framework-wms",
   "edi-voxel",
   "event",
   "field-service",
